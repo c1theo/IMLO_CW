@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from model import SimpleCNN
 
+
 MEAN = [0.4914, 0.4822, 0.4465]
 STD  = [0.2023, 0.1994, 0.2010]
 def get_test_loader(batch_size):
@@ -44,4 +45,4 @@ def evaluate(model_path):
 
 
 if __name__ == "__main__":
-    evaluate("training/model2")
+    evaluate("training/modelIter3")
