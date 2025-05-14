@@ -3,12 +3,12 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from model import SimpleCNN
 
-
+MEAN = [0.4914, 0.4822, 0.4465]
+STD  = [0.2023, 0.1994, 0.2010]
 def get_test_loader(batch_size):
     tfm = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5),
-                             (0.5, 0.5, 0.5))
+        transforms.Normalize(MEAN, STD)
     ])
     test_set = datasets.CIFAR10(root="data",
                                 train=False,

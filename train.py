@@ -5,11 +5,12 @@ from torchvision import datasets, transforms
 from pathlib import Path
 from model import SimpleCNN
 
-
+# CIFAR-10 statistics
+MEAN = [0.4914, 0.4822, 0.4465]
+STD  = [0.2023, 0.1994, 0.2010]
 def get_train_loader(batch_size: int = 128):
     aug = [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip(), transforms.ToTensor(),
-           transforms.Normalize((0.5, 0.5, 0.5),
-                                (0.5, 0.5, 0.5)), transforms.RandomErasing(p=0.15,  # 15 % chance per image
+           transforms.Normalize(MEAN, STD), transforms.RandomErasing(p=0.15,  # 15 % chance per image
                                                                            scale=(0.02, 0.2),
                                                                            ratio=(0.3, 3.3),
                                                                            value=0)]
@@ -37,7 +38,9 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
     model = SimpleCNN().to(device)
     loader = get_train_loader(batch_size)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=0.1, patience=2
+    )
     loss_fn = nn.CrossEntropyLoss()
 
     best_acc = 0.0
@@ -57,18 +60,19 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
             running_loss += loss.item() * x.size(0)
             correct += (logits.argmax(1) == y).sum().item()
             total += y.size(0)
-        scheduler.step()
+        val_loss = running_loss / total
+        scheduler.step(val_loss)
 
         val_acc = correct / total
         print(f"Epoch is {epoch} ||| "
-              f"loss is {running_loss / total:.4f} ||| "
+              f"loss is {val_loss:.4f} ||| "
               f"accuracy is {correct / total:.4f}")
 
         if val_acc > best_acc:
             best_acc = val_acc
             early_ctr = 0
-            Path("training").mkdir(exist_ok=True)
-            torch.save(model.state_dict(), save_path)
+            #Path("training").mkdir(exist_ok=True)
+            #torch.save(model.state_dict(), save_path)
         else:
             early_ctr += 1
             if early_ctr >= patience:
@@ -81,4 +85,4 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
 
 
 if __name__ == "__main__":
-    train(epochs=60, lr=1e-3, batch_size=128, save_path="training/model2", weight_decay=5e-4, patience=5)
+    train(epochs=80, lr=1e-3, batch_size=128, save_path="training/model2", weight_decay=5e-4, patience=5)
