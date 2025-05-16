@@ -18,15 +18,24 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2)
+            nn.MaxPool2d(2, 2),
+
+
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
         )
 
         self.fc_layers = nn.Sequential(
             nn.Flatten(),
             nn.Dropout(p=0.1),
-            nn.Linear(128 * 4 * 4, 256),
+            nn.Linear(256 * 2 * 2, 256),
             nn.ReLU(),
-            nn.Linear(256, 10)
+            nn.Dropout(p=0.1),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10)
         )
 
     def forward(self, x):

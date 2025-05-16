@@ -45,4 +45,4 @@ def evaluate(model_path):
 
 
 if __name__ == "__main__":
-    evaluate("training/modelIter5")
+    evaluate("training/modelIter8")

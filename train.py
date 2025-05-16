@@ -12,6 +12,11 @@ STD  = [0.2023, 0.1994, 0.2010]
 MAX_DURATION = 3 * 3600 + 50 * 60 # Does not let model train for more than 3 hours 50
 def get_train_loader(batch_size = 128):
     aug = [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip(),
+           transforms.ColorJitter(
+               brightness=0.2,
+               contrast=0.2,
+               saturation=0.2,
+               hue=0.1),
            transforms.ToTensor(), transforms.Normalize(MEAN, STD),
            transforms.RandomErasing(p=0.20,  # 20 % chance per image - change pixel area to mean colour
                                     scale=(0.02, 0.2),
@@ -25,12 +30,6 @@ def get_train_loader(batch_size = 128):
     # with smaller probality for just black
 
     tfm = transforms.Compose(aug)
-    """
-    tfm = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5),
-                             (0.5, 0.5, 0.5))
-    ])"""
     train_set = datasets.CIFAR10(root="data",
                                  train=True,
                                  download=True,
@@ -101,4 +100,4 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
 
 
 if __name__ == "__main__":
-    train(epochs=300, lr=1e-3, batch_size=128, save_path="training/modelIter5", weight_decay=5e-4, patience=10)
+    train(epochs=300, lr=1e-3, batch_size=128, save_path="training/modelIter8", weight_decay=5e-4, patience=10)
