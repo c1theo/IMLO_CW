@@ -49,7 +49,7 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
     loader = get_train_loader(batch_size)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.1, patience=2
+        optimizer, mode='min', factor=0.5, patience=2
     )
     loss_fn = nn.CrossEntropyLoss()
 
@@ -87,8 +87,8 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
         if val_acc > best_acc:
             best_acc = val_acc
             early_ctr = 0
-            #Path("training").mkdir(exist_ok=True)
-            #torch.save(model.state_dict(), save_path)
+            Path("training").mkdir(exist_ok=True)
+            torch.save(model.state_dict(), save_path)
         else:
             early_ctr += 1
             if early_ctr >= patience:
@@ -101,4 +101,4 @@ def train(epochs, lr, batch_size, save_path, weight_decay, patience):
 
 
 if __name__ == "__main__":
-    train(epochs=300, lr=1e-3, batch_size=128, save_path="training/modelIter3", weight_decay=5e-4, patience=5)
+    train(epochs=300, lr=1e-3, batch_size=128, save_path="training/modelIter5", weight_decay=5e-4, patience=10)
